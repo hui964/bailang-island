@@ -1,0 +1,13 @@
+{"kind":"workbook","id":"wb/bpojqe","sheets":6,"tables":6}
+{"kind":"sheet","id":"ws/6ajj6u","name":"统计说明","index":0,"range":"A1:C15","address":"A1:C15","tables":1}
+{"kind":"table","sheet":"统计说明","address":"A1:C15","rows":15,"cols":3,"values":[["白浪屿网页全站文案清单",null,null],["导出范围：当前主网页 index.html，以及网页载入的随笔、摘录、手记数据文件。",null,null],[null,null,null],["工作表","条目数","说明"],["页面文案-全部出现",2814,"静态文字、属性提示、动态脚本文案；保留重复项"],["页面文案-去重",2421,"相同文字合并，适合统一校对"],["随笔",103,"标题、摘要与完整正文"],["摘录",272,"主题、主题范围与完整摘录"],["手记",58,"按册与页面拆分的完整正文"],[null,null,null],["使用说明",null,null],["1. “页面文案-全部出现”适合定位源码中的每一次使用；“页面文案-去重”适合集中改稿。",null,null],["2. 页面脚本里的动态文本已纳入；纯技术标识、文件路径、颜色值与代码选择器已排除。",null,null],["3. 随笔、摘录和手记保留原始文字，不执行润色、纠错或改写。",null,null],["4. 本表以当前代码版本为准；后续页面新增文案需重新导出。",null,null]]}
+{"kind":"sheet","id":"ws/3j6cge","name":"页面文案-全部出现","index":1,"range":"A1:G2818","address":"A1:G2818","tables":1}
+{"kind":"table","sheet":"页面文案-全部出现","address":"A1:G2818","rows":2818,"cols":7,"values":[["页面文案｜全部出现",null,null,null,null],["保留每一次出现及源码行号，便于逐处核对与修改。",null,null,null,null],[null,null,null,null,null]],"valuesTruncated":true,"valuesPreviewRows":3,"valuesPreviewCols":5,"valuesPreviewAddress":"A1:E3"}
+{"kind":"sheet","id":"ws/o7cs2t","name":"页面文案-去重","index":2,"range":"A1:F2425","address":"A1:F2425","tables":1}
+{"kind":"table","sheet":"页面文案-去重","address":"A1:F2425","rows":2425,"cols":6,"values":[["页面文案｜去重清单",null,null,null,null],["相同文字合并为一条，出现次数和全部行号保留在右侧。",null,null,null,null],[null,null,null,null,null]],"valuesTruncated":true,"valuesPreviewRows":3,"valuesPreviewCols":5,"valuesPreviewAddress":"A1:E3"}
+{"kind":"sheet","id":"ws/md1ia8","name":"随笔","index":3,"range":"A1:H107","address":"A1:H107","tables":1}
+{"kind":"table","sheet":"随笔","address":"A1:H107","rows":107,"cols":8,"values":[["随笔文案",null,null,null,null],["来自网页加载的数据文件 assets/essays-data.js。",null,null,null,null],[null,null,null,null,null]],"valuesTruncated":true,"valuesPreviewRows":3,"valuesPreviewCols":5,"valuesPreviewAddress":"A1:E3"}
+{"kind":"sheet","id":"ws/g1a858","name":"摘录","index":4,"range":"A1:F276","address":"A1:F276","tables":1}
+{"kind":"table","sheet":"摘录","address":"A1:F276","rows":276,"cols":6,"values":[["摘录文案",null,null,null,null],["主题名称和主题范围已与摘录正文对应。",null,null,null,null],[null,null,null,null,null]],"valuesTruncated":true,"valuesPreviewRows":3,"valuesPreviewCols":5,"valuesPreviewAddress":"A1:E3"}
+{"kind":"sheet","id":"ws/crv8s7","name":"手记","index":5,"range":"A1:J62","address":"A1:J62","tables":1}
+{"kind":"table","sheet":"手记","address":"A1:J62","rows":62,"cols":10,"values":[["旅行手记文案",null,null,null,null],["按手记、页面顺序保留标题、章节与正文。",null,null,null,null],[null,null,null,null,null]],"valuesTruncated":true,"valuesPreviewRows":3,"valuesPreviewCols":5,"valuesPreviewAddress":"A1:E3"}

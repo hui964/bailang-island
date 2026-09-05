@@ -406,6 +406,8 @@
       } else {
         if (key === "class") key = "className";
         else if (key === "for") key = "htmlFor";
+        else if (key === "sc-src") key = "src";
+        else if (key === "sc-poster") key = "poster";
         else if (key.startsWith("on"))
           key = EVENT_MAP[key] || "on" + key[2].toUpperCase() + key.slice(3);
       }
@@ -1034,16 +1036,20 @@
   }
 
   // src/cdn.ts
-  var REACT_URL = "https://unpkg.com/react@18.3.1/umd/react.production.min.js";
+  var REACT_URL = "vendor/react.production.min.js";
   var REACT_SRI = "sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z";
-  var REACT_DOM_URL = "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js";
+  var REACT_DOM_URL = "vendor/react-dom.production.min.js";
   var REACT_DOM_SRI = "sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1";
-  var BABEL_URL = "https://unpkg.com/@babel/standalone@7.29.0/babel.min.js";
+  var BABEL_URL = "vendor/babel.min.js";
   var BABEL_SRI = "sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y";
   function cdnScriptFor(url, sri) {
     const res = window.__resources;
     const v = res ? res[url] : void 0;
-    return typeof v === "string" && v ? { src: v } : { src: url, integrity: sri };
+    if (typeof v === "string" && v) return { src: v };
+    // 本地双击打开网页时，file:// 资源不应携带线上用的 SRI/CORS 属性，
+    // 否则部分浏览器会拒绝相邻目录里的 React 文件并只留下黑色背景。
+    if (location.protocol === "file:") return { src: url };
+    return { src: url, integrity: sri };
   }
 
   // src/external.ts
@@ -1632,10 +1638,10 @@
     if (w.React && w.ReactDOM) return Promise.resolve();
     const react = cdnScriptFor(REACT_URL, REACT_SRI);
     const reactDom = cdnScriptFor(REACT_DOM_URL, REACT_DOM_SRI);
-    return Promise.all([
-      loadScript(react.src, react.integrity),
-      loadScript(reactDom.src, reactDom.integrity)
-    ]).then(() => void 0);
+    // ReactDOM 依赖 React；顺序加载可避免本地磁盘或强缓存下的偶发竞态。
+    return loadScript(react.src, react.integrity).then(
+      () => loadScript(reactDom.src, reactDom.integrity)
+    ).then(() => void 0);
   }
   function init() {
     const runtime = createRuntime(document);
@@ -1698,6 +1704,10 @@
   hideRawTemplate();
   loadReactUmd().then(init).catch((err) => {
     console.error("[dc] failed to load React or boot:", err);
-    throw err;
+    const notice = document.createElement("main");
+    notice.setAttribute("role", "alert");
+    notice.style.cssText = "position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:24px;background:#11202b;color:#f7edd8;font:16px/1.8 system-ui,sans-serif;text-align:center";
+    notice.innerHTML = '<div><strong style="display:block;font-size:24px;margin-bottom:8px">白浪屿未能载入</strong><span>请确认 vendor 文件夹与 index.html 放在同一目录中，然后刷新页面。</span></div>';
+    document.body.appendChild(notice);
   });
 })();
