@@ -25,6 +25,14 @@
       if (!active || !name) return;
       if (window.umami && typeof window.umami.track === 'function') window.umami.track(name, data || {});
       else queued.push([name, data || {}]);
+    },
+    pageview: function (url, title) {
+      if (!active || !url) return;
+      var payload = { url: url, title: title || document.title };
+      if (window.umami && typeof window.umami.track === 'function') {
+        window.umami.track(function (props) { return Object.assign({}, props, payload); });
+      }
+      else queued.push([null, payload]);
     }
   };
   if (!active) return;
@@ -37,7 +45,10 @@
   tracker.setAttribute('data-do-not-track', 'true');
   tracker.onload = function () {
     if (!window.umami || typeof window.umami.track !== 'function') return;
-    queued.splice(0).forEach(function (event) { window.umami.track(event[0], event[1]); });
+    queued.splice(0).forEach(function (event) {
+      if (event[0]) window.umami.track(event[0], event[1]);
+      else window.umami.track(function (props) { return Object.assign({}, props, event[1]); });
+    });
   };
   document.head.appendChild(tracker);
 })();
@@ -8314,6 +8325,25 @@ class Component extends DCLogic {
       }
     } catch (e) {}
   }
+  trackPageView(url, title) {
+    try {
+      if (window.whitewaveAnalytics && typeof window.whitewaveAnalytics.pageview === 'function') {
+        window.whitewaveAnalytics.pageview(url, title);
+      }
+    } catch (e) {}
+  }
+  analyticsBasePath() {
+    return location.pathname.replace(/index\.html$/i, '').replace(/\/?$/, '/');
+  }
+  trackScenePage(sceneId, sceneName) {
+    this.trackPageView(
+      this.analyticsBasePath() + '#/scene/' + encodeURIComponent(sceneId),
+      '白浪屿 · ' + sceneName
+    );
+  }
+  trackIslandPage() {
+    this.trackPageView(this.analyticsBasePath(), '白浪屿 · 岛屿地图');
+  }
   analyticsSceneId(id) { return id === 'cinemaRoom' ? 'cinema' : id; }
   beginSceneAnalytics(id, source) {
     const sceneId = this.analyticsSceneId(id);
@@ -8323,6 +8353,7 @@ class Component extends DCLogic {
     if (this._analyticsSceneId) this.endSceneAnalytics(this._analyticsSceneId, 'scene-switch');
     this._analyticsSceneId = sceneId;
     this._analyticsSceneStartedAt = Date.now();
+    this.trackScenePage(sceneId, building.zh);
     this.trackEvent('scene-enter', { scene_id:sceneId, scene_name:building.zh, source:source || 'map' });
   }
   endSceneAnalytics(id, reason) {
@@ -8330,7 +8361,14 @@ class Component extends DCLogic {
     if (!sceneId || this._analyticsSceneId !== sceneId) return;
     const building = TOWN.buildings[sceneId];
     const seconds = Math.max(1, Math.round((Date.now() - (this._analyticsSceneStartedAt || Date.now())) / 1000));
-    this.trackEvent('scene-stay', { scene_id:sceneId, scene_name:building ? building.zh : sceneId, duration_seconds:seconds, reason:reason || 'leave' });
+    const exitReason = reason || 'leave';
+    this.trackEvent('scene-stay', {
+      scene_id:sceneId,
+      scene_name:building ? building.zh : sceneId,
+      duration_seconds:seconds,
+      reason:exitReason,
+      left_website:exitReason === 'page-hide'
+    });
     this._analyticsSceneId = null;
     this._analyticsSceneStartedAt = 0;
   }
@@ -10372,7 +10410,10 @@ class Component extends DCLogic {
   }
   backToTown() {
     const from = this.state.view === 'interior' ? this.state.focused : null;
-    if (from) this.endSceneAnalytics(from, 'back-to-island');
+    if (from) {
+      this.endSceneAnalytics(from, 'back-to-island');
+      this.trackIslandPage();
+    }
     const isRouteStop = KEEPER_ROUTE.some(stop => stop.id === from);
     const completed = isRouteStop
       ? [...new Set((this.state.keeperCompleted || []).concat(from))]
